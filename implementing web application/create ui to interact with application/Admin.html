@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>CART</title>
+<META charset="UTF-8">
+<META name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<META NAME='rating' CONTENT='General' />
+<META NAME='expires' CONTENT='never' />
+<META NAME='language' CONTENT='English, EN' />
+<META name="description" content="shopping cart project with HTML5 and JavaScript">
+<META name="keywords" content="HTML5,CSS,JavaScript, html5 session storage, html5 local storage">
+<META name="author" content="dcwebmakers.com">
+<script>
+
+async function  SaveItem(e) {
+			e.preventDefault();
+	var name = document.forms.ShoppingList.name.value;
+	var data = document.forms.ShoppingList.data.value;
+	// localStorage.setItem(name, data);
+
+	const product={name,data};
+	try{
+	const result=await fetch("http://127.0.0.1:5000/products/delete",
+	{method :"POST",mode:"no-cors",headers:{"Access-Control-Allow-Origin:'*'"},body:JSON.stringify(product)}).
+	then(r=>{
+		console.log(r.json())
+	});
+	doShowAll(rs=>{
+		console.log(rs);
+	});
+}catch(err){
+	console.log(err);
+}
+	
+}
+function ModifyItem() {
+	var name1 = document.forms.ShoppingList.name.value;
+	var data1 = document.forms.ShoppingList.data.value;
+	//check if name1 is already exists
+	
+//check if key exists
+			if (localStorage.getItem(name1) !=null)
+			{
+			  //update
+			  localStorage.setItem(name1,data1);
+			  document.forms.ShoppingList.data.value = localStorage.getItem(name1);
+			}
+		
+	
+	doShowAll();
+}
+
+function RemoveItem() {
+	var name = document.forms.ShoppingList.name.value;
+	document.forms.ShoppingList.data.value = localStorage.removeItem(name);
+	doShowAll();
+}
+function ClearAll() {
+	localStorage.clear();
+	doShowAll();
+}
+function doShowAll() {
+	if (CheckBrowser()) {
+		var key = "";
+		var list = "<tr><th>Item</th><th>Value</th></tr>\n";
+		var i = 0;
+		//for more advance feature, you can set cap on max items in the cart
+		for (i = 0; i <= localStorage.length-1; i++) {
+			key = localStorage.key(i);
+			list += "<tr><td>" + key + "</td>\n<td>"
+					+ localStorage.getItem(key) + "</td></tr>\n";
+		}
+		//if no item exists in the cart
+		if (list == "<tr><th>Item</th><th>Value</th></tr>\n") {
+			list += "<tr><td><i>empty</i></td>\n<td><i>empty</i></td></tr>\n";
+		}
+		//bind the data to html table
+		//you can use jQuery too....
+		document.getElementById('list').innerHTML = list;
+	} else {
+		alert('Cannot save shopping list as your browser does not support HTML 5');
+	}
+}
+
+
+function CheckBrowser() {
+	if ('localStorage' in window && window['localStorage'] !== null) {
+		// we can use localStorage object to store data
+		return true;
+	} else {
+			return false;
+	}
+}
+</script>
+<style>
+td,th {
+	font-family: monospace;
+	padding: 4px;
+	background-color: #ccc;
+}
+
+label {
+	vertical-align: top;
+}
+
+#main {
+	border: 1px dotted blue;
+	padding: 6px;
+	background-color: #ccc;
+	margin-right: 50%;
+}
+
+#items_table {
+	border: 1px dotted blue;
+	padding: 6px;
+	margin-top: 12px;
+	margin-right: 50%;
+        background-color: #ccc;
+}
+
+#items_table h3 {
+	font-size: 18px;
+	margin-top: 0px;
+	font-family: sans-serif;
+}
+body{
+
+}
+h1{
+
+}
+a{
+
+}
+.btn {
+  background-color: #04AA6D;
+  color: white;
+  margin: 10px 0;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 17px;
+    text-decoration: none;
+  display: inline-block;
+
+}
+
+ c{
+float:right;
+margin-right:50px;
+}
+form{
+	
+	
+  
+	
+}
+.mainform{
+	
+  
+  width:800px; 
+  margin:0 auto;
+}
+
+</style>
+
+<script>
+const crudform=(e)=>{
+	e.preventDefault();
+	alert(e.forms);
+console.log(e);
+}
+</script>
+
+</head>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<body onload="doShowAll()">
+<h1><center>Admin pannel</center></h1>
+<a href='/' class='topnav-icons fa fa-sign-out  w3-bar-item w3-button'style=float:right color:white>Back</a>
+<div class="mainform">
+<form name=ShoppingList action="https://127.0.0.1:5000/Admin/CrudProduct"  method="POST" onsubmit="crudform()">
+
+		<div id="main">
+			<table >
+				<tr>
+
+					<td><b>Item:</b><input type=text name=name></td>
+					<td><b>Quantity:</b><input type=text name=data></td>
+
+				</tr>
+
+				<tr>
+					<td>
+					    <input type="submit" value="Save" name="save"   > 
+					    <input type="submit" value="Update" name="modify" onclick="ModifyItem()"> 
+					    <input type="submit" value="Delete" name="remove" onclick="RemoveItem()">
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="items_table">
+			<h3>Shopping List</h3>
+			<table id=list></table>
+			<p>
+				<label><input type=button value="Clear" onclick="ClearAll()">
+					
+			</p>
+		</div>
+	</form>
+</div>	
+
+</body>
+</html>
